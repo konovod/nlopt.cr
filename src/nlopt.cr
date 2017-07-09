@@ -1,5 +1,5 @@
 require "./nlopt/*"
 
-module Nlopt
+module NLopt
   # TODO Put your code here
 end
