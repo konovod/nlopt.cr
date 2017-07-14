@@ -25,8 +25,6 @@ fun force_stop = nlopt_force_stop(opt : Opt) : Result
 fun set_force_stop = nlopt_set_force_stop(opt : Opt, val : LibC::Int) : Result
 fun get_force_stop = nlopt_get_force_stop(opt : Opt) : LibC::Int
 
-fun set_local_optimizer = nlopt_set_local_optimizer(opt : Opt, local_opt : Opt) : Result
-
 fun set_default_initial_step = nlopt_set_default_initial_step(opt : Opt, x : LibC::Double*) : Result
 fun set_initial_step = nlopt_set_initial_step(opt : Opt, dx : LibC::Double*) : Result
 fun set_initial_step1 = nlopt_set_initial_step1(opt : Opt, dx : LibC::Double) : Result

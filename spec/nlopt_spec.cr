@@ -25,6 +25,19 @@ describe NLopt do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
     s1.xtol_rel = 1e-8
     s1.objective = ->(x : Slice(Float64)) { (x[0] - 3)**2 + (x[1] - 2)**2 }
-    pp s1.solve
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::XtolReached
+    x[0].should be_close(3, 1e-7)
+    x[1].should be_close(2, 1e-7)
+    f.should be_close(0, 1e-7)
+  end
+
+  it "behave nicely when function raises" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
+    s1.xtol_rel = 1e-8
+    s1.objective = ->(x : Slice(Float64)) { raise "exception in objective" }
+    expect_raises(Exception, "exception in objective") do
+      s1.solve
+    end
   end
 end

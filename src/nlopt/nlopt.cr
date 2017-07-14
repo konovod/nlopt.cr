@@ -102,5 +102,9 @@ module NLopt
         LibNLopt.set_{{var.id}}(@handle.not_nil!, value)
       end
     {% end %}
+
+    def local_optimizer(local : Solver)
+      LibNLopt.set_local_optimizer(@handle.not_nil!, local.@handle.not_nil!)
+    end
   end
 end
