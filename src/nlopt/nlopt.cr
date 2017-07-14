@@ -93,5 +93,14 @@ module NLopt
       result = LibNLopt.optimize(@handle.not_nil!, x, out f)
       {result, x, f}
     end
+
+    {% for var in {:stopval, :ftol_rel, :ftol_abs, :xtol_rel, :maxeval, :maxtime, :population, :vector_storage} %}
+      def {{var.id}}
+        LibNLopt.get_{{var.id}}(@handle.not_nil!)
+      end
+      def {{var.id}}=(value)
+        LibNLopt.set_{{var.id}}(@handle.not_nil!, value)
+      end
+    {% end %}
   end
 end

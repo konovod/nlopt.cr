@@ -23,6 +23,7 @@ describe NLopt do
 
   it "can optimize function without constraints" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
+    s1.xtol_rel = 1e-8
     s1.objective = ->(x : Slice(Float64)) { (x[0] - 3)**2 + (x[1] - 2)**2 }
     pp s1.solve
   end
