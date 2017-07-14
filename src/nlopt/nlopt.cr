@@ -22,14 +22,47 @@ module NLopt
   alias ObjectiveNoGrad = Proc(Slice(Float64), Float64)
   alias ObjectiveGradOnly = Proc(Slice(Float64), Slice(Float64), Void)
 
+  class Variable
+    property min : Float64
+    property max : Float64
+    property guess : Float64?
+    property abs_tol : Float64?
+    property initial_step : Float64?
+
+    def default_guess
+      if @min.infinite? && @max.infinite?
+        0.0
+      elsif @min.infinite?
+        @max > 0 ? 0.0 : @max*2
+      elsif @max.infinite?
+        @min < 0 ? 0.0 : @min*2
+      else
+        (@min + @max) / 2
+      end
+    end
+
+    def set(*, min = @min, max = @max, guess = @guess, abs_tol = @abs_tol, initial_step = @initial_step)
+      @min = min.to_f
+      @max = max.to_f
+      @guess = guess.try(&.to_f)
+      @abs_tol = abs_tol.try(&.to_f)
+      @initial_step = initial_step.try(&.to_f)
+    end
+
+    protected def initialize(@min = -Float64::INFINITY, @max = Float64::INFINITY, @guess = nil, @abs_tol = nil, @initial_step = nil)
+    end
+  end
+
   class Solver
     @handle : LibNLopt::Opt?
+    getter variables
     property objective : ObjectiveWithGrad | ObjectiveNoGrad | Nil
     property obj_gradient : ObjectiveGradOnly | Nil
     property optim_dir = Direction::Minimize
 
     def initialize(algorithm, size)
       @handle = LibNLopt.create(algorithm, size)
+      @variables = Array(Variable).new(size) { Variable.new }
     end
 
     def algorithm : Algorithm
@@ -51,11 +84,12 @@ module NLopt
       free
     end
 
-    protected def initialize(@handle, @objective, @obj_gradient, @optim_dir)
+    protected def initialize(@handle, @objective, @obj_gradient, @optim_dir, vars)
+      @variables = Array(Variable).new(vars.size) { |i| vars[i].dup }
     end
 
     def clone
-      Solver.new(@handle.try { |h| LibNLopt.copy(h) }, @objective, @obj_gradient, @optim_dir)
+      Solver.new(@handle.try { |h| LibNLopt.copy(h) }, @objective, @obj_gradient, @optim_dir, @variables)
     end
 
     protected def eval_obj(n, x : Float64*, grad : Float64*) : Float64
@@ -87,9 +121,31 @@ module NLopt
       end
     end
 
+    private def set_vars
+      arr = Slice(Float64).new(dimension, 0.0)
+      @variables.each_with_index { |v, i| arr[i] = v.min }
+      LibNLopt.set_lower_bounds(@handle.not_nil!, arr)
+      @variables.each_with_index { |v, i| arr[i] = v.max }
+      LibNLopt.set_upper_bounds(@handle.not_nil!, arr)
+
+      if @variables.any? { |v| v.initial_step.nil? }
+        guess = Slice(Float64).new(dimension) { |i| @variables[i].guess || @variables[i].default_guess }
+        LibNLopt.get_initial_step(@handle.not_nil!, guess, arr)
+      end
+      @variables.each_with_index do |v, i|
+        if step = v.initial_step
+          arr[i] = step
+        end
+      end
+      LibNLopt.set_initial_step(@handle.not_nil!, arr)
+      @variables.each_with_index { |v, i| arr[i] = v.abs_tol || -1.0 }
+      LibNLopt.set_xtol_abs(@handle.not_nil!, arr)
+    end
+
     def solve
       set_objective
-      x = Array(Float64).new(dimension, 0.0)
+      set_vars
+      x = Array(Float64).new(dimension) { |i| @variables[i].guess || @variables[i].default_guess }
       result = LibNLopt.optimize(@handle.not_nil!, x, out f)
       {result, x, f}
     end

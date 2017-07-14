@@ -40,4 +40,17 @@ describe NLopt do
       s1.solve
     end
   end
+
+  it "can set bounds and other options for variables" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
+    s1.xtol_rel = 1e-8
+    s1.variables[0].set(min: 4, guess: 50)
+    s1.variables[1].set(max: 2, initial_step: 1.0)
+    s1.objective = ->(x : Slice(Float64)) { (x[0] - 3)**4 + (x[1] - 2)**2 }
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::XtolReached
+    x[0].should be_close(4, 1e-7)
+    x[1].should be_close(2, 1e-7)
+    f.should be_close(1.0, 1e-7)
+  end
 end

@@ -1,13 +1,6 @@
 fun set_precond_min_objective = nlopt_set_precond_min_objective(opt : Opt, f : Func, pre : Precond, f_data : Void*) : Result
 fun set_precond_max_objective = nlopt_set_precond_max_objective(opt : Opt, f : Func, pre : Precond, f_data : Void*) : Result
 
-fun set_lower_bounds = nlopt_set_lower_bounds(opt : Opt, lb : LibC::Double*) : Result
-fun set_lower_bounds1 = nlopt_set_lower_bounds1(opt : Opt, lb : LibC::Double) : Result
-fun get_lower_bounds = nlopt_get_lower_bounds(opt : Opt, lb : LibC::Double*) : Result
-fun set_upper_bounds = nlopt_set_upper_bounds(opt : Opt, ub : LibC::Double*) : Result
-fun set_upper_bounds1 = nlopt_set_upper_bounds1(opt : Opt, ub : LibC::Double) : Result
-fun get_upper_bounds = nlopt_get_upper_bounds(opt : Opt, ub : LibC::Double*) : Result
-
 fun remove_inequality_constraints = nlopt_remove_inequality_constraints(opt : Opt) : Result
 fun add_inequality_constraint = nlopt_add_inequality_constraint(opt : Opt, fc : Func, fc_data : Void*, tol : LibC::Double) : Result
 fun add_precond_inequality_constraint = nlopt_add_precond_inequality_constraint(opt : Opt, fc : Func, pre : Precond, fc_data : Void*, tol : LibC::Double) : Result
@@ -16,15 +9,6 @@ fun remove_equality_constraints = nlopt_remove_equality_constraints(opt : Opt) :
 fun add_equality_constraint = nlopt_add_equality_constraint(opt : Opt, h : Func, h_data : Void*, tol : LibC::Double) : Result
 fun add_precond_equality_constraint = nlopt_add_precond_equality_constraint(opt : Opt, h : Func, pre : Precond, h_data : Void*, tol : LibC::Double) : Result
 fun add_equality_mconstraint = nlopt_add_equality_mconstraint(opt : Opt, m : LibC::UInt, h : Mfunc, h_data : Void*, tol : LibC::Double*) : Result
-
-fun set_xtol_abs1 = nlopt_set_xtol_abs1(opt : Opt, tol : LibC::Double) : Result
-fun set_xtol_abs = nlopt_set_xtol_abs(opt : Opt, tol : LibC::Double*) : Result
-fun get_xtol_abs = nlopt_get_xtol_abs(opt : Opt, tol : LibC::Double*) : Result
-
-fun set_default_initial_step = nlopt_set_default_initial_step(opt : Opt, x : LibC::Double*) : Result
-fun set_initial_step = nlopt_set_initial_step(opt : Opt, dx : LibC::Double*) : Result
-fun set_initial_step1 = nlopt_set_initial_step1(opt : Opt, dx : LibC::Double) : Result
-fun get_initial_step = nlopt_get_initial_step(opt : Opt, x : LibC::Double*, dx : LibC::Double*) : Result
 
 fun set_munge = nlopt_set_munge(opt : Opt, munge_on_destroy : Munge, munge_on_copy : Munge)
 fun munge_data = nlopt_munge_data(opt : Opt, munge : Munge2, data : Void*)
