@@ -49,16 +49,7 @@ end
 @[Link("nlopt")]
 lib LibNLopt
   alias PtrdiffT = LibC::SizeT
-  fun algorithm_name = nlopt_algorithm_name(a : NLopt::Algorithm) : LibC::Char*
-  fun srand = nlopt_srand(seed : LibC::ULong)
-  fun srand_time = nlopt_srand_time
-  fun version = nlopt_version(major : LibC::Int*, minor : LibC::Int*, bugfix : LibC::Int*)
-  alias OptS = Void
-  fun create = nlopt_create(algorithm : NLopt::Algorithm, n : LibC::UInt) : Opt
   type Opt = Void*
-  fun destroy = nlopt_destroy(opt : Opt)
-  fun copy = nlopt_copy(opt : Opt) : Opt
-  fun optimize = nlopt_optimize(opt : Opt, x : LibC::Double*, opt_f : LibC::Double*) : Result
   enum Result
     Failure         = -1
     InvalidArgs     = -2
@@ -72,29 +63,45 @@ lib LibNLopt
     MaxevalReached  =  5
     MaxtimeReached  =  6
   end
-  fun set_min_objective = nlopt_set_min_objective(opt : Opt, f : Func, f_data : Void*) : Result
   alias Func = (LibC::UInt, LibC::Double*, LibC::Double*, Void* -> LibC::Double)
-  fun set_max_objective = nlopt_set_max_objective(opt : Opt, f : Func, f_data : Void*) : Result
-  fun set_precond_min_objective = nlopt_set_precond_min_objective(opt : Opt, f : Func, pre : Precond, f_data : Void*) : Result
   alias Precond = (LibC::UInt, LibC::Double*, LibC::Double*, LibC::Double*, Void* -> Void)
-  fun set_precond_max_objective = nlopt_set_precond_max_objective(opt : Opt, f : Func, pre : Precond, f_data : Void*) : Result
+  alias Mfunc = (LibC::UInt, LibC::Double*, LibC::UInt, LibC::Double*, LibC::Double*, Void* -> Void)
+  alias Munge = (Void* -> Void*)
+  alias Munge2 = (Void*, Void* -> Void*)
+  alias FuncOld = (LibC::Int, LibC::Double*, LibC::Double*, Void* -> LibC::Double)
+
+  fun algorithm_name = nlopt_algorithm_name(a : NLopt::Algorithm) : LibC::Char*
+  fun srand = nlopt_srand(seed : LibC::ULong)
+  fun srand_time = nlopt_srand_time
+  fun version = nlopt_version(major : LibC::Int*, minor : LibC::Int*, bugfix : LibC::Int*)
+  fun create = nlopt_create(algorithm : NLopt::Algorithm, n : LibC::UInt) : Opt
+  fun destroy = nlopt_destroy(opt : Opt)
+  fun copy = nlopt_copy(opt : Opt) : Opt
   fun get_algorithm = nlopt_get_algorithm(opt : Opt) : NLopt::Algorithm
   fun get_dimension = nlopt_get_dimension(opt : Opt) : LibC::UInt
+  fun set_min_objective = nlopt_set_min_objective(opt : Opt, f : Func, f_data : Void*) : Result
+  fun set_max_objective = nlopt_set_max_objective(opt : Opt, f : Func, f_data : Void*) : Result
+  fun set_precond_min_objective = nlopt_set_precond_min_objective(opt : Opt, f : Func, pre : Precond, f_data : Void*) : Result
+  fun set_precond_max_objective = nlopt_set_precond_max_objective(opt : Opt, f : Func, pre : Precond, f_data : Void*) : Result
+
+  fun optimize = nlopt_optimize(opt : Opt, x : LibC::Double*, opt_f : LibC::Double*) : Result
+
   fun set_lower_bounds = nlopt_set_lower_bounds(opt : Opt, lb : LibC::Double*) : Result
   fun set_lower_bounds1 = nlopt_set_lower_bounds1(opt : Opt, lb : LibC::Double) : Result
   fun get_lower_bounds = nlopt_get_lower_bounds(opt : Opt, lb : LibC::Double*) : Result
   fun set_upper_bounds = nlopt_set_upper_bounds(opt : Opt, ub : LibC::Double*) : Result
   fun set_upper_bounds1 = nlopt_set_upper_bounds1(opt : Opt, ub : LibC::Double) : Result
   fun get_upper_bounds = nlopt_get_upper_bounds(opt : Opt, ub : LibC::Double*) : Result
+
   fun remove_inequality_constraints = nlopt_remove_inequality_constraints(opt : Opt) : Result
   fun add_inequality_constraint = nlopt_add_inequality_constraint(opt : Opt, fc : Func, fc_data : Void*, tol : LibC::Double) : Result
   fun add_precond_inequality_constraint = nlopt_add_precond_inequality_constraint(opt : Opt, fc : Func, pre : Precond, fc_data : Void*, tol : LibC::Double) : Result
   fun add_inequality_mconstraint = nlopt_add_inequality_mconstraint(opt : Opt, m : LibC::UInt, fc : Mfunc, fc_data : Void*, tol : LibC::Double*) : Result
-  alias Mfunc = (LibC::UInt, LibC::Double*, LibC::UInt, LibC::Double*, LibC::Double*, Void* -> Void)
   fun remove_equality_constraints = nlopt_remove_equality_constraints(opt : Opt) : Result
   fun add_equality_constraint = nlopt_add_equality_constraint(opt : Opt, h : Func, h_data : Void*, tol : LibC::Double) : Result
   fun add_precond_equality_constraint = nlopt_add_precond_equality_constraint(opt : Opt, h : Func, pre : Precond, h_data : Void*, tol : LibC::Double) : Result
   fun add_equality_mconstraint = nlopt_add_equality_mconstraint(opt : Opt, m : LibC::UInt, h : Mfunc, h_data : Void*, tol : LibC::Double*) : Result
+
   fun set_stopval = nlopt_set_stopval(opt : Opt, stopval : LibC::Double) : Result
   fun get_stopval = nlopt_get_stopval(opt : Opt) : LibC::Double
   fun set_ftol_rel = nlopt_set_ftol_rel(opt : Opt, tol : LibC::Double) : Result
@@ -122,14 +129,14 @@ lib LibNLopt
   fun set_initial_step = nlopt_set_initial_step(opt : Opt, dx : LibC::Double*) : Result
   fun set_initial_step1 = nlopt_set_initial_step1(opt : Opt, dx : LibC::Double) : Result
   fun get_initial_step = nlopt_get_initial_step(opt : Opt, x : LibC::Double*, dx : LibC::Double*) : Result
+
   fun set_munge = nlopt_set_munge(opt : Opt, munge_on_destroy : Munge, munge_on_copy : Munge)
-  alias Munge = (Void* -> Void*)
   fun munge_data = nlopt_munge_data(opt : Opt, munge : Munge2, data : Void*)
-  alias Munge2 = (Void*, Void* -> Void*)
+
   fun minimize = nlopt_minimize(algorithm : NLopt::Algorithm, n : LibC::Int, f : FuncOld, f_data : Void*, lb : LibC::Double*, ub : LibC::Double*, x : LibC::Double*, minf : LibC::Double*, minf_max : LibC::Double, ftol_rel : LibC::Double, ftol_abs : LibC::Double, xtol_rel : LibC::Double, xtol_abs : LibC::Double*, maxeval : LibC::Int, maxtime : LibC::Double) : Result
-  alias FuncOld = (LibC::Int, LibC::Double*, LibC::Double*, Void* -> LibC::Double)
   fun minimize_constrained = nlopt_minimize_constrained(algorithm : NLopt::Algorithm, n : LibC::Int, f : FuncOld, f_data : Void*, m : LibC::Int, fc : FuncOld, fc_data : Void*, fc_datum_size : PtrdiffT, lb : LibC::Double*, ub : LibC::Double*, x : LibC::Double*, minf : LibC::Double*, minf_max : LibC::Double, ftol_rel : LibC::Double, ftol_abs : LibC::Double, xtol_rel : LibC::Double, xtol_abs : LibC::Double*, maxeval : LibC::Int, maxtime : LibC::Double) : Result
   fun minimize_econstrained = nlopt_minimize_econstrained(algorithm : NLopt::Algorithm, n : LibC::Int, f : FuncOld, f_data : Void*, m : LibC::Int, fc : FuncOld, fc_data : Void*, fc_datum_size : PtrdiffT, p : LibC::Int, h : FuncOld, h_data : Void*, h_datum_size : PtrdiffT, lb : LibC::Double*, ub : LibC::Double*, x : LibC::Double*, minf : LibC::Double*, minf_max : LibC::Double, ftol_rel : LibC::Double, ftol_abs : LibC::Double, xtol_rel : LibC::Double, xtol_abs : LibC::Double*, htol_rel : LibC::Double, htol_abs : LibC::Double, maxeval : LibC::Int, maxtime : LibC::Double) : Result
+
   fun get_local_search_algorithm = nlopt_get_local_search_algorithm(deriv : NLopt::Algorithm*, nonderiv : NLopt::Algorithm*, maxeval : LibC::Int*)
   fun set_local_search_algorithm = nlopt_set_local_search_algorithm(deriv : NLopt::Algorithm, nonderiv : NLopt::Algorithm, maxeval : LibC::Int)
   fun get_stochastic_population = nlopt_get_stochastic_population : LibC::Int

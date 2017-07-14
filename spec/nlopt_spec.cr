@@ -20,4 +20,10 @@ describe NLopt do
     end
     s2.algorithm.should eq NLopt::Algorithm::LnCobyla
   end
+
+  it "can optimize function without constraints" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
+    s1.objective = ->(x : Slice(Float64)) { (x[0] - 3)**2 + (x[1] - 2)**2 }
+    pp s1.solve
+  end
 end
