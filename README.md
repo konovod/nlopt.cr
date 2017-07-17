@@ -4,13 +4,13 @@ Idea is to provide wrappers for most performant opensource optimization tools th
 According to http://plato.asu.edu/bench.html IPOPT performs pretty fast, almost on par with commercial solvers.
 According to  http://repositorium.sdum.uminho.pt/bitstream/1822/39109/1/Eliana_ICNAAM2014.pdf NLopt is slower, but still finds optimum.
 
-The problem is that IPOPT is pretty complex to even get installed, have a lot of dependencies, so it perhaps doesn't fit in the general-purpose scientific library. NLopt has also much simpler API.
+The problem is that IPOPT is pretty complex to get installed, have a lot of dependencies, so it perhaps doesn't fit in the general-purpose scientific library. NLopt has also much simpler API.
 
-So this is a wrapper of NLopt library.
+So this is a wrapper of [NLopt library](http://ab-initio.mit.edu/wiki/index.php/NLopt).
 
 ## Installation
 
-1. Install NLopt from package manager.
+1. Install NLopt from package manager (`apt install libnlopt0` for Ubuntu, https://aur.archlinux.org/packages/nlopt for Arch).
 2. Add this to your application's `shard.yml`:
 
 ```yaml
