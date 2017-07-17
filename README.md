@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/konovod/nlopt.svg?branch=master)](https://travis-ci.org/konovod/nlopt)
 # NLOpt
 Idea is to provide wrappers for most performant opensource optimization tools that are available. This shard is about nonlinear optimization.
 
