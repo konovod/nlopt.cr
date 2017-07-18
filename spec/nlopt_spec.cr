@@ -53,4 +53,38 @@ describe NLopt do
     x[1].should be_close(2, 1e-7)
     f.should be_close(1.0, 1e-7)
   end
+
+  it "works with separate function for gradient" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
+    s1.xtol_rel = 1e-8
+    s1.objective = ->(x : Slice(Float64)) { (x[0] - 1) * (x[1] - 2)**2 }
+    s1.obj_gradient = ->(x : Slice(Float64), grad : Slice(Float64)) do
+      grad[0] = (x[1] - 2)**2
+      grad[1] = 2*(x[0] - 1)*(x[1] - 2)
+    end
+    s1.variables[0].min = 2.0
+    s1.variables[1].max = 10.0
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::XtolReached
+    x[1].should be_close(2, 1e-7)
+    f.should be_close(0, 1e-7)
+  end
+
+  it "works with combined function for gradient" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
+    s1.xtol_rel = 1e-8
+    s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
+      if grad
+        grad[0] = (x[1] - 2)**2
+        grad[1] = 2*(x[0] - 1)*(x[1] - 2)
+      end
+      (x[0] - 1) * (x[1] - 2)**2
+    end
+    s1.variables[0].min = 2.0
+    s1.variables[1].max = 10.0
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::XtolReached
+    x[1].should be_close(2, 1e-7)
+    f.should be_close(0, 1e-7)
+  end
 end

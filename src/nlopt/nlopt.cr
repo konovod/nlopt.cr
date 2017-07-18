@@ -20,7 +20,7 @@ module NLopt
 
   alias ObjectiveWithGrad = Proc(Slice(Float64), Slice(Float64)?, Float64)
   alias ObjectiveNoGrad = Proc(Slice(Float64), Float64)
-  alias ObjectiveGradOnly = Proc(Slice(Float64), Slice(Float64), Void)
+  alias ObjectiveGradOnly = Proc(Slice(Float64), Slice(Float64), Nil)
 
   class Variable
     property min : Float64
@@ -33,9 +33,9 @@ module NLopt
       if @min.infinite? && @max.infinite?
         0.0
       elsif @min.infinite?
-        @max > 0 ? 0.0 : @max*2
+        @max > 0 ? 0.0 : {@max*2, -1.0}.min
       elsif @max.infinite?
-        @min < 0 ? 0.0 : @min*2
+        @min < 0 ? 0.0 : {@min*2, 1.0}.max
       else
         (@min + @max) / 2
       end
