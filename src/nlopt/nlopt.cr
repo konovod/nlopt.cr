@@ -1,3 +1,5 @@
+require "./libnlopt"
+
 module NLopt
   enum Direction
     Minimize =  1
@@ -53,16 +55,22 @@ module NLopt
     end
   end
 
+  abstract class Constraint
+    abstract def apply(h : LibNLopt::Opt)
+  end
+
   class Solver
     @handle : LibNLopt::Opt?
     getter variables
     property objective : ObjectiveWithGrad | ObjectiveNoGrad | Nil
     property obj_gradient : ObjectiveGradOnly | Nil
     property optim_dir = Direction::Minimize
+    property constraints
 
     def initialize(algorithm, size)
       @handle = LibNLopt.create(algorithm, size)
       @variables = Array(Variable).new(size) { Variable.new }
+      @constraints = [] of Constraint
     end
 
     def algorithm : Algorithm
@@ -84,12 +92,13 @@ module NLopt
       free
     end
 
-    protected def initialize(@handle, @objective, @obj_gradient, @optim_dir, vars)
+    protected def initialize(@handle, @objective, @obj_gradient, @optim_dir, vars, cons)
       @variables = Array(Variable).new(vars.size) { |i| vars[i].dup }
+      @constraints = Array(Constraint).new(cons.size) { |i| cons[i].dup }
     end
 
     def clone
-      Solver.new(@handle.try { |h| LibNLopt.copy(h) }, @objective, @obj_gradient, @optim_dir, @variables)
+      Solver.new(@handle.try { |h| LibNLopt.copy(h) }, @objective, @obj_gradient, @optim_dir, @variables, @constraints)
     end
 
     protected def eval_obj(n, x : Float64*, grad : Float64*) : Float64
@@ -108,45 +117,53 @@ module NLopt
       end
     end
 
-    private def set_objective
+    private def set_objective(h)
       f = ->(n : LibC::UInt, x : LibC::Double*, grad : LibC::Double*, data : Void*) {
         it = data.as(Solver)
         it.eval_obj(n, x, grad)
       }
       case @optim_dir
       when Direction::Minimize
-        LibNLopt.set_min_objective(@handle.not_nil!, f, self.as(Void*))
+        LibNLopt.set_min_objective(h, f, self.as(Void*))
       else
-        LibNLopt.set_max_objective(@handle.not_nil!, f, self.as(Void*))
+        LibNLopt.set_max_objective(h, f, self.as(Void*))
       end
     end
 
-    private def set_vars
+    private def set_vars(h)
       arr = Slice(Float64).new(dimension, 0.0)
       @variables.each_with_index { |v, i| arr[i] = v.min }
-      LibNLopt.set_lower_bounds(@handle.not_nil!, arr)
+      LibNLopt.set_lower_bounds(h, arr)
       @variables.each_with_index { |v, i| arr[i] = v.max }
-      LibNLopt.set_upper_bounds(@handle.not_nil!, arr)
+      LibNLopt.set_upper_bounds(h, arr)
 
       if @variables.any? { |v| v.initial_step.nil? }
         guess = Slice(Float64).new(dimension) { |i| @variables[i].guess || @variables[i].default_guess }
-        LibNLopt.get_initial_step(@handle.not_nil!, guess, arr)
+        LibNLopt.get_initial_step(h, guess, arr)
       end
       @variables.each_with_index do |v, i|
         if step = v.initial_step
           arr[i] = step
         end
       end
-      LibNLopt.set_initial_step(@handle.not_nil!, arr)
+      LibNLopt.set_initial_step(h, arr)
       @variables.each_with_index { |v, i| arr[i] = v.abs_tol || -1.0 }
-      LibNLopt.set_xtol_abs(@handle.not_nil!, arr)
+      LibNLopt.set_xtol_abs(h, arr)
+    end
+
+    private def set_constraints(h)
+      LibNLopt.remove_inequality_constraints(h)
+      LibNLopt.remove_equality_constraints(h)
+      @constraints.each { |c| c.apply(h) }
     end
 
     def solve
-      set_objective
-      set_vars
+      raise "solver not initialized" unless h = @handle
+      set_objective(h)
+      set_vars(h)
+      set_constraints(h)
       x = Array(Float64).new(dimension) { |i| @variables[i].guess || @variables[i].default_guess }
-      result = LibNLopt.optimize(@handle.not_nil!, x, out f)
+      result = LibNLopt.optimize(h, x, out f)
       {result, x, f}
     end
 
