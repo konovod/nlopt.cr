@@ -36,13 +36,14 @@ describe NLopt do
   it "can work with equalities" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 3)
     s1.xtol_rel = 1e-8
+    s1.optim_dir = NLopt::Direction::Maximize
     s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
       if grad
-        grad[0] = -x[1]*x[2]
-        grad[1] = -x[0]*x[2]
-        grad[2] = -x[0]*x[1]
+        grad[0] = x[1]*x[2]
+        grad[1] = x[0]*x[2]
+        grad[2] = x[0]*x[1]
       end
-      -x[0]*x[1]*x[2]
+      x[0]*x[1]*x[2]
     end
     s1.constraints << NLopt::SingleConstraint.new(1e-8, equality: true) do |x, grad|
       if grad
@@ -61,6 +62,6 @@ describe NLopt do
     x[0].should be_close(1, 1e-7)
     x[1].should be_close(1, 1e-7)
     x[2].should be_close(1, 1e-7)
-    f.should be_close(-1, 1e-8)
+    f.should be_close(1, 1e-8)
   end
 end
