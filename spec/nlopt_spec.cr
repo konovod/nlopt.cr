@@ -1,8 +1,6 @@
 require "./spec_helper"
 
 describe NLopt do
-  # TODO: Write tests
-
   it "works" do
     LibNLopt.version(out major, out minor, out bugfix)
     puts "NLopt Version: #{major}.#{minor}.#{bugfix}"
@@ -86,45 +84,5 @@ describe NLopt do
     res.should eq NLopt::Result::XtolReached
     x[1].should be_close(2, 1e-7)
     f.should be_close(0, 1e-7)
-  end
-
-  it "can work with nonlinear constraints" do
-    s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
-    s1.xtol_rel = 1e-4
-    s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
-      if grad
-        grad[0] = 0.0
-        grad[1] = 0.5 / Math.sqrt(x[1])
-      end
-      Math.sqrt(x[1])
-    end
-
-    s1.constraints << NLopt::SingleConstraint.new(1e-8) do |x, grad|
-      a = 2
-      b = 0
-      if grad
-        grad[0] = 3 * a * (a*x[0] + b) * (a*x[0] + b)
-        grad[1] = -1.0
-      end
-      ((a*x[0] + b) * (a*x[0] + b) * (a*x[0] + b) - x[1])
-    end
-    s1.constraints << NLopt::SingleConstraint.new(1e-8) do |x, grad|
-      a = -1
-      b = 1
-      if grad
-        grad[0] = 3 * a * (a*x[0] + b) * (a*x[0] + b)
-        grad[1] = -1.0
-      end
-      ((a*x[0] + b) * (a*x[0] + b) * (a*x[0] + b) - x[1])
-    end
-
-    s1.variables[1].min = 0.0
-    s1.variables[0].guess = 1.234
-    s1.variables[1].guess = 5.678
-    res, x, f = s1.solve
-    res.should eq NLopt::Result::XtolReached
-    x[0].should be_close(0.333334, 1e-5)
-    x[1].should be_close(0.296296, 1e-5)
-    f.should be_close(0.544330847, 1e-5)
   end
 end
