@@ -35,7 +35,6 @@ describe NLopt do
 
   it "can work with equalities" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 3)
-    s1.xtol_rel = 1e-8
     s1.optim_dir = NLopt::Direction::Maximize
     s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
       if grad

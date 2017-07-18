@@ -21,7 +21,6 @@ describe NLopt do
 
   it "can optimize function without constraints" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
-    s1.xtol_rel = 1e-8
     s1.objective = ->(x : Slice(Float64)) { (x[0] - 3)**2 + (x[1] - 2)**2 }
     res, x, f = s1.solve
     res.should eq NLopt::Result::XtolReached
@@ -32,7 +31,6 @@ describe NLopt do
 
   it "behave nicely when function raises" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
-    s1.xtol_rel = 1e-8
     s1.objective = ->(x : Slice(Float64)) { raise "exception in objective" }
     expect_raises(Exception, "exception in objective") do
       s1.solve
@@ -41,7 +39,6 @@ describe NLopt do
 
   it "can set bounds and other options for variables" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
-    s1.xtol_rel = 1e-8
     s1.variables[0].set(min: 4, guess: 50)
     s1.variables[1].set(max: 2, initial_step: 1.0)
     s1.objective = ->(x : Slice(Float64)) { (x[0] - 3)**4 + (x[1] - 2)**2 }
@@ -54,7 +51,6 @@ describe NLopt do
 
   it "works with separate function for gradient" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
-    s1.xtol_rel = 1e-8
     s1.objective = ->(x : Slice(Float64)) { (x[0] - 1) * (x[1] - 2)**2 }
     s1.obj_gradient = ->(x : Slice(Float64), grad : Slice(Float64)) do
       grad[0] = (x[1] - 2)**2
@@ -70,7 +66,6 @@ describe NLopt do
 
   it "works with combined function for gradient" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
-    s1.xtol_rel = 1e-8
     s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
       if grad
         grad[0] = (x[1] - 2)**2

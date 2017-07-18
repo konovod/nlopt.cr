@@ -5,6 +5,7 @@ module NLopt
     Minimize =  1
     Maximize = -1
   end
+  private DEFAULT_XTOL_REL = 1e-9
 
   enum Algorithm
     def to_s
@@ -117,7 +118,7 @@ module NLopt
       end
     end
 
-    private def set_objective(h)
+    private def apply_objective(h)
       f = ->(n : LibC::UInt, x : LibC::Double*, grad : LibC::Double*, data : Void*) {
         it = data.as(Solver)
         it.eval_obj(n, x, grad)
@@ -130,7 +131,7 @@ module NLopt
       end
     end
 
-    private def set_vars(h)
+    private def apply_vars(h)
       arr = Slice(Float64).new(dimension, 0.0)
       @variables.each_with_index { |v, i| arr[i] = v.min }
       LibNLopt.set_lower_bounds(h, arr)
@@ -149,19 +150,27 @@ module NLopt
       LibNLopt.set_initial_step(h, arr)
       @variables.each_with_index { |v, i| arr[i] = v.abs_tol || -1.0 }
       LibNLopt.set_xtol_abs(h, arr)
+      return arr.any?(&.> 0.0)
     end
 
-    private def set_constraints(h)
+    private def apply_constraints(h)
       LibNLopt.remove_inequality_constraints(h)
       LibNLopt.remove_equality_constraints(h)
       @constraints.each { |c| c.apply(h) }
     end
 
+    private def has_stop_condition
+      ftol_rel > 0 || ftol_abs > 0 || xtol_rel > 0 || maxeval > 0 || maxtime > 0
+    end
+
     def solve
       raise "solver not initialized" unless h = @handle
-      set_objective(h)
-      set_vars(h)
-      set_constraints(h)
+      apply_objective(h)
+      any_stop = apply_vars(h)
+      apply_constraints(h)
+      unless any_stop || has_stop_condition
+        self.xtol_rel = DEFAULT_XTOL_REL
+      end
       x = Array(Float64).new(dimension) { |i| @variables[i].guess || @variables[i].default_guess }
       result = LibNLopt.optimize(h, x, out f)
       {result, x, f}
