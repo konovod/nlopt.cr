@@ -1,7 +1,7 @@
 require "./spec_helper"
 
 def test_constraint(a, b)
-  NLopt::SingleConstraint.new(1e-8) do |x, grad|
+  NLopt.inequality do |x, grad|
     if grad
       grad[0] = 3 * a * (a*x[0] + b) * (a*x[0] + b)
       grad[1] = -1.0
@@ -45,7 +45,7 @@ describe NLopt do
       end
       x[0]*x[1]*x[2]
     end
-    s1.constraints << NLopt::SingleConstraint.new(1e-8, equality: true) do |x, grad|
+    s1.constraints << NLopt.equality do |x, grad|
       if grad
         grad[0] = 1.0
         grad[1] = 1.0

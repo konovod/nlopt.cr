@@ -1,9 +1,34 @@
 require "./nlopt"
 
 module NLopt
-  # fun add_equality_constraint = nlopt_add_equality_constraint(opt : Opt,
-  # h : Func, h_data : Void*, tol : LibC::Double) : Result
+  extend self
+  private DEFAULT_CONSTRAINT_TOL = 1e-8
+
   alias ConstraintFunction = Proc(Slice(Float64), Slice(Float64)?, Float64)
+
+  def self.equality(tol, f)
+    SingleConstraint.new(tol, f, equality: true)
+  end
+
+  def self.inequality(tol, f)
+    SingleConstraint.new(tol, f, equality: false)
+  end
+
+  def self.equality(f)
+    SingleConstraint.new(true, DEFAULT_CONSTRAINT_TOL, f)
+  end
+
+  def self.inequality(f)
+    SingleConstraint.new(false, DEFAULT_CONSTRAINT_TOL, f)
+  end
+
+  def self.equality(tol = DEFAULT_CONSTRAINT_TOL, &block : (Slice(Float64), Slice(Float64)? -> Float64))
+    SingleConstraint.new(true, tol, ->(x : Slice(Float64), grad : Slice(Float64)?) { block.call(x, grad) })
+  end
+
+  def self.inequality(tol = DEFAULT_CONSTRAINT_TOL, &block : (Slice(Float64), Slice(Float64)? -> Float64))
+    SingleConstraint.new(false, tol, ->(x : Slice(Float64), grad : Slice(Float64)?) { block.call(x, grad) })
+  end
 
   class SingleConstraint < Constraint
     property f : ConstraintFunction
@@ -15,10 +40,7 @@ module NLopt
       f.call(x.to_slice(n), need_grad ? grad.to_slice(n) : nil)
     end
 
-    def initialize(@tol, *, @equality = false, &block : (Slice(Float64), Slice(Float64)? -> Float64))
-      @f = ->(x : Slice(Float64), grad : Slice(Float64)?) do
-        block.call(x, grad)
-      end
+    protected def initialize(@equality, @tol, @f)
     end
 
     def apply(h : LibNLopt::Opt)
