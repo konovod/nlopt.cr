@@ -25,6 +25,6 @@ jobs:
     - name: Install dependencies
       run: apt-get install -y libnlopt0
     - name: create link to NLOpt
-      run: ln -s /usr/lib/x86_64-linux-gnu/openblas-pthread/libnlopt.so.0 /usr/lib/x86_64-linux-gnu/libnlopt.so
+      run: ln -s /usr/lib/x86_64-linux-gnu/libnlopt.so.0 /usr/lib/x86_64-linux-gnu/libnlopt.so
     - name: Run tests
       run: crystal spec
