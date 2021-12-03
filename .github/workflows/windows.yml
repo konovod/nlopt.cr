@@ -1,0 +1,34 @@
+name: Windows CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '0 6 * * 6'
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Crystal
+      uses: crystal-lang/install-crystal@v1.5.3
+    - name: Download NLOpt
+      shell: powershell
+      run: Invoke-WebRequest -Uri "http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip" `
+                             -OutFile ./nlopt.zip
+    - name: Unzip NLOpt
+      shell: cmd
+      run: |
+        mkdir nlopt
+        move nlopt.zip ./nlopt
+        cd nlopt
+        7z x -y nlopt.zip
+        lib /def:libnlopt-0.def /machine:x64
+        copy .\libnlopt-0.dll ..\
+        copy .\libnlopt-0.lib ..\
+        cd ..
+        copy .\libnlopt-0.lib D:\a\_temp\crystal-nightly-true-undefined\bin\lib
+    - name: Run tests
+      run: crystal spec
