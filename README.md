@@ -21,6 +21,14 @@ dependencies:
     github: konovod/nlopt
 ```
 
+On Windows:
+  you can get compiled version 2.4.2 using instructions from this page: http://ab-initio.mit.edu/wiki/index.php?title=NLopt_on_Windows
+  Basically
+  1. download http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip
+  2. unpack, call `lib /def:libnlopt-0.def /machine:x64` in the unpacked directory to generate `libnlopt-0.lib`
+  3. copy `libnlopt-0.dll` to your program directory
+  4. copy `libnlopt-0.lib` to where your Crystal looks for lib files
+
 ## Usage
 
 ```crystal
@@ -28,6 +36,7 @@ require "nlopt"
 ```
 
 TODO: Write usage instructions here
+you can check `spec` directory for simple examples
 
 ## Development
 
