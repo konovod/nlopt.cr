@@ -1,5 +1,6 @@
-[![Linux CI](https://github.com/konovod/linalg/actions/workflows/linux.yml/badge.svg)](https://github.com/konovod/nlopt/actions/workflows/linux.yml)
-[![Windows CI](https://github.com/konovod/linalg/actions/workflows/windows.yml/badge.svg)](https://github.com/konovod/nlopt/actions/workflows/windows.yml) 
+[![Linux CI](https://github.com/konovod/nlopt/actions/workflows/linux.yml/badge.svg)](https://github.com/konovod/nlopt/actions/workflows/linux.yml)
+[![Windows CI](https://github.com/konovod/nlopt/actions/workflows/windows.yml/badge.svg)](https://github.com/konovod/nlopt/actions/workflows/windows.yml) 
+[![MacOSX CI](https://github.com/konovod/nlopt/actions/workflows/macos.yml/badge.svg)](https://github.com/konovod/nlopt/actions/workflows/macos.yml) 
 # NLOpt
 Idea is to provide wrappers for most performant opensource optimization tools that are available. This shard is about nonlinear optimization.
 
