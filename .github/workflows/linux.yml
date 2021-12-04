@@ -16,9 +16,11 @@ jobs:
           - {os: ubuntu-latest, crystal: latest}
           - {os: ubuntu-latest, crystal: nightly}  
     runs-on: ${{matrix.os}}
-    container:
-      image: crystallang/crystal
     steps:
+    - name: Install Crystal
+      uses: crystal-lang/install-crystal@v1.5.3
+      with:
+        crystal: ${{matrix.crystal}}
     - uses: actions/checkout@v2
     - name: apt update?
       run: apt-get update

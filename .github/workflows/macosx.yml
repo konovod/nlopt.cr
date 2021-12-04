@@ -1,0 +1,22 @@
+name: MacOSX CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '0 6 * * 6'
+jobs:
+  build-macos:
+    strategy:
+      fail-fast: false
+    runs-on: macos-latest
+    steps:
+    - name: Install Crystal
+      uses: crystal-lang/install-crystal@v1.5.3
+    - uses: actions/checkout@v2
+    - name: install nlopt
+      run: brew install nlopt
+    - name: Run tests
+      run: crystal spec
