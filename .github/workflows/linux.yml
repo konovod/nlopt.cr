@@ -23,10 +23,10 @@ jobs:
         crystal: ${{matrix.crystal}}
     - uses: actions/checkout@v2
     - name: apt update?
-      run: apt-get update
+      run: sudo apt-get update
     - name: Install dependencies
-      run: apt-get install -y libnlopt0
+      run: sudo apt-get install -y libnlopt0
     - name: create link to NLOpt
-      run: ln -s /usr/lib/x86_64-linux-gnu/libnlopt.so.0 /usr/lib/x86_64-linux-gnu/libnlopt.so
+      run: sudo ln -s /usr/lib/x86_64-linux-gnu/libnlopt.so.0 /usr/lib/x86_64-linux-gnu/libnlopt.so
     - name: Run tests
       run: crystal spec
