@@ -131,7 +131,7 @@ end
  - [ ] Algorithm-specific parameters
  - [x] setting random seed
 ```crystal
-NLopt.srand(nil) # will randomize seed
+NLopt.srand # will randomize seed
 NLopt.srand(12345_u64) # will set fixed seed
 ```
  - [ ] Preconditioning with approximate Hessians
