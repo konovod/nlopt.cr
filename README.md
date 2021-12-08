@@ -39,7 +39,7 @@ require "nlopt"
 you can check `spec` directory for simple examples.
 Supported features:
  - [x] creating and freeing solvers with any of 43 supported algorithms
- ```crystal
+```crystal
 s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 100)
 s1.dimension.should eq 100
 (s1.algorithm.to_s[0..5]).should eq "COBYLA"
@@ -49,9 +49,9 @@ expect_raises(Exception) do
   s1.algorithm
 end
 s2.algorithm.should eq NLopt::Algorithm::LnCobyla
- ```
+```
  - [x] simple optimization of given function
- ```crystal
+```crystal
 s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
 s1.objective = ->(x : Slice(Float64)) { (x[0] - 3)**2 + (x[1] - 2)**2 }
 res, x, f = s1.solve
@@ -59,9 +59,9 @@ res.should eq NLopt::Result::XtolReached
 x[0].should be_close(3, 1e-7)
 x[1].should be_close(2, 1e-7)
 f.should be_close(0, 1e-7)
- ```
+```
  - [x] setting parameters of solver
- ```crystal
+```crystal
 s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 100)
 s1.optim_dir = NLopt::Direction::Maximize # default is minimize
 # stopval, ftol_rel, ftol_abs, xtol_rel, maxeval, maxtime, population, vector_storage are supported. Check nlopt documentation for description
@@ -72,16 +72,16 @@ s1_local = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 100)
 s1.local_optimizer(s1_local)
 ```
  - [x] setting minimum and maximum bound, initial guess and initial step for variables
- ```crystal
+```crystal
 s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
 s1.variables[0].min = 2.0
 s1.variables[1].max = 10.0
 # or several params at once:
 s1.variables[0].set(min: 4, guess: 50)
 s1.variables[1].set(max: 2, initial_step: 1.0) 
- ```
+```
  - [x] use separate function for gradient calculation on calculate gradient together with objective function
- ```crystal
+```crystal
 s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
 s1.objective = ->(x : Slice(Float64)) { (x[0] - 1) * (x[1] - 2)**2 }
 s1.obj_gradient = ->(x : Slice(Float64), grad : Slice(Float64)) do
@@ -97,9 +97,9 @@ s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
   end
   (x[0] - 1) * (x[1] - 2)**2
 end
- ```
+```
  - [x] Constraints in forms of equalities and inequalities
- ```crystal
+```crystal
 s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
 s1.xtol_rel = 1e-4
 s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
@@ -125,30 +125,25 @@ s1.constraints << NLopt.equality do |x, grad|
   end
   x[0] + x[1] - 3
 end
- ```
+```
  - [ ] Vector-valued constraints
  - [ ] Forced termination (would require multithreading as currently optimization is syncronous)
  - [ ] Algorithm-specific parameters
  - [x] setting random seed
- ```crystal
+```crystal
 NLopt.srand(nil) # will randomize seed
 NLopt.srand(12345_u64) # will set fixed seed
- ```
+```
  - [ ] Preconditioning with approximate Hessians
  - [x] Version number
-```
+```crystal
 LibNLopt.version(out major, out minor, out bugfix)
 puts "NLopt Version: #{major}.#{minor}.#{bugfix}"
 ```
 
-
-## Development
-
-TODO: Write development instructions here
-
 ## Contributing
 
-1. Fork it ( https://github.com/konovod/nlopt/fork )
+1. Fork it ( https://github.com/konovod/nlopt.cr/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)
