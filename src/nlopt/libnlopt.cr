@@ -43,6 +43,7 @@ module NLopt
     LdSlsqp                 = 40
     LdCcsaq                 = 41
     GnEsch                  = 42
+    GnAgs                   = 43
   end
 
   enum Result
@@ -76,6 +77,11 @@ lib LibNLopt
   alias FuncOld = (LibC::Int, LibC::Double*, LibC::Double*, Void* -> LibC::Double)
 
   fun algorithm_name = nlopt_algorithm_name(a : NLopt::Algorithm) : LibC::Char*
+  fun algorithm_to_string = nlopt_algorithm_to_string(algorithm : NLopt::Algorithm) : LibC::Char*
+  fun algorithm_from_string = nlopt_algorithm_from_string(name : LibC::Char*) : NLopt::Algorithm
+  fun result_to_string = nlopt_result_to_string(result : NLopt::Result) : LibC::Char*
+  fun result_from_string = nlopt_result_from_string(name : LibC::Char*) : NLopt::Result
+
   fun srand = nlopt_srand(seed : LibC::ULong)
   fun srand_time = nlopt_srand_time
   fun version = nlopt_version(major : LibC::Int*, minor : LibC::Int*, bugfix : LibC::Int*)
@@ -90,12 +96,21 @@ lib LibNLopt
   fun set_precond_max_objective = nlopt_set_precond_max_objective(opt : Opt, f : Func, pre : Precond, f_data : Void*) : NLopt::Result
 
   fun optimize = nlopt_optimize(opt : Opt, x : LibC::Double*, opt_f : LibC::Double*) : NLopt::Result
+  fun get_errmsg = nlopt_get_errmsg(opt : Opt) : LibC::Char*
+
+  fun set_param = nlopt_set_param(opt : Opt, name : LibC::Char*, val : LibC::Double)
+  fun get_param = nlopt_get_param(opt : Opt, name : LibC::Char*, defaultval : LibC::Double) : LibC::Double
+  fun has_param = nlopt_has_param(opt : Opt, name : LibC::Char*) : LibC::Int
+  fun num_params = nlopt_num_params(opt : Opt) : LibC::UInt
+  fun nlopt_nth_param = nlopt_nth_param(opt : Opt, n : LibC::UInt) : LibC::Char*
 
   fun set_lower_bounds = nlopt_set_lower_bounds(opt : Opt, lb : LibC::Double*) : NLopt::Result
   fun set_lower_bounds1 = nlopt_set_lower_bounds1(opt : Opt, lb : LibC::Double) : NLopt::Result
+  fun set_lower_bound = nlopt_set_lower_bound(opt : Opt, i : LibC::Int, lb : LibC::Double*) : NLopt::Result
   fun get_lower_bounds = nlopt_get_lower_bounds(opt : Opt, lb : LibC::Double*) : NLopt::Result
   fun set_upper_bounds = nlopt_set_upper_bounds(opt : Opt, ub : LibC::Double*) : NLopt::Result
   fun set_upper_bounds1 = nlopt_set_upper_bounds1(opt : Opt, ub : LibC::Double) : NLopt::Result
+  fun set_upper_bound = nlopt_set_upper_bound(opt : Opt, i : LibC::Int, lb : LibC::Double*) : NLopt::Result
   fun get_upper_bounds = nlopt_get_upper_bounds(opt : Opt, ub : LibC::Double*) : NLopt::Result
 
   fun remove_inequality_constraints = nlopt_remove_inequality_constraints(opt : Opt) : NLopt::Result
@@ -118,8 +133,12 @@ lib LibNLopt
   fun set_xtol_abs1 = nlopt_set_xtol_abs1(opt : Opt, tol : LibC::Double) : NLopt::Result
   fun set_xtol_abs = nlopt_set_xtol_abs(opt : Opt, tol : LibC::Double*) : NLopt::Result
   fun get_xtol_abs = nlopt_get_xtol_abs(opt : Opt, tol : LibC::Double*) : NLopt::Result
+  fun set_x_weights1 = nlopt_set_x_weights1(opt : Opt, w : LibC::Double) : NLopt::Result
+  fun set_x_weights = nlopt_set_x_weights(opt : Opt, w : LibC::Double*) : NLopt::Result
+  fun get_x_weights = nlopt_get_x_weights(opt : Opt, w : LibC::Double*) : NLopt::Result
   fun set_maxeval = nlopt_set_maxeval(opt : Opt, maxeval : LibC::Int) : NLopt::Result
   fun get_maxeval = nlopt_get_maxeval(opt : Opt) : LibC::Int
+  fun get_numevals = nlopt_get_numevals(opt : Opt) : LibC::Int
   fun set_maxtime = nlopt_set_maxtime(opt : Opt, maxtime : LibC::Double) : NLopt::Result
   fun get_maxtime = nlopt_get_maxtime(opt : Opt) : LibC::Double
   fun force_stop = nlopt_force_stop(opt : Opt) : NLopt::Result
@@ -135,8 +154,12 @@ lib LibNLopt
   fun set_initial_step1 = nlopt_set_initial_step1(opt : Opt, dx : LibC::Double) : NLopt::Result
   fun get_initial_step = nlopt_get_initial_step(opt : Opt, x : LibC::Double*, dx : LibC::Double*) : NLopt::Result
 
+  # Unused API
+
   fun set_munge = nlopt_set_munge(opt : Opt, munge_on_destroy : Munge, munge_on_copy : Munge)
   fun munge_data = nlopt_munge_data(opt : Opt, munge : Munge2, data : Void*)
+
+  # Deprecated API
 
   fun minimize = nlopt_minimize(algorithm : NLopt::Algorithm, n : LibC::Int, f : FuncOld, f_data : Void*, lb : LibC::Double*, ub : LibC::Double*, x : LibC::Double*, minf : LibC::Double*, minf_max : LibC::Double, ftol_rel : LibC::Double, ftol_abs : LibC::Double, xtol_rel : LibC::Double, xtol_abs : LibC::Double*, maxeval : LibC::Int, maxtime : LibC::Double) : NLopt::Result
   fun minimize_constrained = nlopt_minimize_constrained(algorithm : NLopt::Algorithm, n : LibC::Int, f : FuncOld, f_data : Void*, m : LibC::Int, fc : FuncOld, fc_data : Void*, fc_datum_size : PtrdiffT, lb : LibC::Double*, ub : LibC::Double*, x : LibC::Double*, minf : LibC::Double*, minf_max : LibC::Double, ftol_rel : LibC::Double, ftol_abs : LibC::Double, xtol_rel : LibC::Double, xtol_abs : LibC::Double*, maxeval : LibC::Int, maxtime : LibC::Double) : NLopt::Result
