@@ -29,6 +29,7 @@ On Windows:
   2. unpack, rename `libnlopt-0.def` to `nlopt.def`, call `lib /def:nlopt.def /machine:x64` in the unpacked directory to generate `nlopt.lib`
   3. copy `libnlopt-0.dll` to your program directory (rename to `nlopt.dll`)
   4. copy `nlopt.lib` to where your Crystal looks for lib files
+
 Alternatively, you can compile latest (2.7.1) version from source (https://github.com/stevengj/nlopt). Windows CI Action does it too, so you can grab dll library from it's artifacts. Note that it depends on msvcp140.dll.
 
 ## Usage
