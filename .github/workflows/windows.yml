@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ master ]
   schedule:
-    - cron: '0 6 * * 6'
+    - cron: '0 6 * * 6'  # Periodic builds are requirement of awesome-crystal
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -14,21 +14,35 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Crystal
       uses: crystal-lang/install-crystal@v1.5.3
-    - name: Download NLOpt
-      shell: powershell
-      run: Invoke-WebRequest -Uri "http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip" `
-                             -OutFile ./nlopt.zip
-    - name: Unzip NLOpt
+    - name: Download NLOpt sources
+      uses: actions/checkout@v2
+      with:
+        repository: stevengj/nlopt
+        ref: v2.7.1
+        path: nlopt
+    - name: Build NLOpt
       shell: cmd
       run: |
-        mkdir nlopt
-        move nlopt.zip ./nlopt
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         cd nlopt
-        7z x -y nlopt.zip
-        lib /def:libnlopt-0.def /machine:x64
-        copy .\libnlopt-0.dll ..\
-        copy .\libnlopt-0.lib ..\
+        md build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -G "NMake Makefiles" ..
+        nmake
+        copy .\nlopt.dll ..\..\libnlopt-0.dll
+        copy .\nlopt.lib ..\..\libnlopt-0.lib
+        cd ..
         cd ..
         copy .\libnlopt-0.lib D:\a\_temp\crystal-nightly-true-undefined\bin\lib
+    - name: Upload nlopt.dll
+      uses: actions/upload-artifact@v2
+      with:
+        name: nlopt_${{github.sha}}
+        path: libnlopt-0.dll
+    - name: Upload nlopt.lib
+      uses: actions/upload-artifact@v2
+      with:
+        name: nlopt_${{github.sha}}
+        path: libnlopt-0.lib
     - name: Run tests
       run: crystal spec
