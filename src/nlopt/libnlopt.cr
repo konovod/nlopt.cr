@@ -61,11 +61,7 @@ module NLopt
   end
 end
 
-{% if flag? :windows %}
-  @[Link("libnlopt-0")]
-{% else %}
-  @[Link("nlopt")]
-{% end %}
+@[Link("nlopt")]
 lib LibNLopt
   alias PtrdiffT = LibC::SizeT
   type Opt = Void*
