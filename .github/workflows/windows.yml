@@ -29,20 +29,20 @@ jobs:
         cd build
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -G "NMake Makefiles" ..
         nmake
-        copy .\nlopt.dll ..\..\libnlopt-0.dll
-        copy .\nlopt.lib ..\..\libnlopt-0.lib
+        copy .\nlopt.dll ..\..\nlopt.dll
+        copy .\nlopt.lib ..\..\nlopt.lib
         cd ..
         cd ..
-        copy .\libnlopt-0.lib D:\a\_temp\crystal-nightly-true-undefined\bin\lib
+        copy .\nlopt.lib D:\a\_temp\crystal-nightly-true-undefined\bin\lib
     - name: Upload nlopt.dll
       uses: actions/upload-artifact@v2
       with:
         name: nlopt_${{github.sha}}
-        path: libnlopt-0.dll
+        path: nlopt.dll
     - name: Upload nlopt.lib
       uses: actions/upload-artifact@v2
       with:
         name: nlopt_${{github.sha}}
-        path: libnlopt-0.lib
+        path: nlopt.lib
     - name: Run tests
       run: crystal spec
