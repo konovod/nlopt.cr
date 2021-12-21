@@ -26,9 +26,11 @@ On Windows:
   you can get compiled version 2.4.2 using instructions from this page: http://ab-initio.mit.edu/wiki/index.php?title=NLopt_on_Windows
   Basically
   1. download http://ab-initio.mit.edu/nlopt/nlopt-2.4.2-dll64.zip
-  2. unpack, call `lib /def:libnlopt-0.def /machine:x64` in the unpacked directory to generate `libnlopt-0.lib`
-  3. copy `libnlopt-0.dll` to your program directory
-  4. copy `libnlopt-0.lib` to where your Crystal looks for lib files
+  2. unpack, rename `libnlopt-0.def` to `nlopt.def`, call `lib /def:nlopt.def /machine:x64` in the unpacked directory to generate `nlopt.lib`
+  3. copy `libnlopt-0.dll` to your program directory (rename to `nlopt.dll`)
+  4. copy `nlopt.lib` to where your Crystal looks for lib files
+
+Alternatively, you can compile latest (2.7.1) version from source (https://github.com/stevengj/nlopt). Windows CI Action does it too, so you can grab dll library from it's artifacts. Note that it depends on msvcp140.dll.
 
 ## Usage
 
@@ -141,7 +143,7 @@ end
 ```
 
  - [ ] Forced termination (would require multithreading as currently optimization is syncronous)
- - [ ] Algorithm-specific parameters
+ - [ ] Algorithm-specific parameters (only for NLOpt version >= 2.7)
  - [x] setting random seed
 ```crystal
 NLopt.srand # will randomize seed
