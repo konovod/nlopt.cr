@@ -80,4 +80,48 @@ describe NLopt do
     x[1].should be_close(2, 1e-7)
     f.should be_close(0, 1e-7)
   end
+
+  it "works with preconditioning using approximate hessian" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LdCcsaq, 2)
+    s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
+      if grad
+        grad[0] = (x[1] - 2)**2
+        grad[1] = 2*(x[0] - 1)*(x[1] - 2)
+      end
+      (x[0] - 1) * (x[1] - 2)**2
+    end
+    s1.precondition = ->(x : Slice(Float64), hessian : Slice(Float64)) do
+      hessian[0] = 1.0
+      hessian[1] = 0.0
+      hessian[2] = 1.0
+      hessian[3] = 0.0
+    end
+    s1.variables[0].min = 2.0
+    s1.variables[1].max = 10.0
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::XtolReached
+    x[1].should be_close(2, 1e-7)
+    f.should be_close(0, 1e-7)
+  end
+
+  it "works with preconditioning using approximate hessian in sparse form" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LdCcsaq, 2)
+    s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
+      if grad
+        grad[0] = (x[1] - 2)**2
+        grad[1] = 2*(x[0] - 1)*(x[1] - 2)
+      end
+      (x[0] - 1) * (x[1] - 2)**2
+    end
+    s1.precondition = ->(x : Slice(Float64), v : Slice(Float64), vpre : Slice(Float64)) do
+      vpre[0] = v[0]
+      vpre[1] = v[1]
+    end
+    s1.variables[0].min = 2.0
+    s1.variables[1].max = 10.0
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::XtolReached
+    x[1].should be_close(2, 1e-7)
+    f.should be_close(0, 1e-7)
+  end
 end

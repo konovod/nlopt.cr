@@ -149,7 +149,23 @@ end
 NLopt.srand # will randomize seed
 NLopt.srand(12345_u64) # will set fixed seed
 ```
- - [ ] Preconditioning with approximate Hessians
+ - [x] Preconditioning with approximate Hessians for objective function
+ ```crystal
+     s1.precondition = ->(x : Slice(Float64), hessian : Slice(Float64)) do
+      hessian[0] = 1.0
+      hessian[1] = 0.0
+      hessian[2] = 1.0
+      hessian[3] = 0.0
+    end
+
+    # or, in a more effecient way
+
+     s1.precondition = ->(x : Slice(Float64), v : Slice(Float64), vpre : Slice(Float64)) do
+      vpre[0] = v[0]
+      vpre[1] = v[1]
+    end
+ ```
+ - [ ] Preconditioning with approximate Hessians for constraints
  - [x] Version number
 ```crystal
 LibNLopt.version(out major, out minor, out bugfix)

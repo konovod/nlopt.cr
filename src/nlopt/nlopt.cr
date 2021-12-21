@@ -24,6 +24,8 @@ module NLopt
   alias ObjectiveWithGrad = Proc(Slice(Float64), Slice(Float64)?, Float64)
   alias ObjectiveNoGrad = Proc(Slice(Float64), Float64)
   alias ObjectiveGradOnly = Proc(Slice(Float64), Slice(Float64), Nil)
+  alias ObjectivePrecondition = Proc(Slice(Float64), Slice(Float64), Nil)
+  alias ObjectivePreconditionEval = Proc(Slice(Float64), Slice(Float64), Slice(Float64), Nil)
 
   class Variable
     property min : Float64
@@ -64,7 +66,8 @@ module NLopt
     @handle : LibNLopt::Opt?
     getter variables
     property objective : ObjectiveWithGrad | ObjectiveNoGrad | Nil
-    property obj_gradient : ObjectiveGradOnly | Nil
+    property obj_gradient : ObjectiveGradOnly?
+    property precondition : ObjectivePrecondition | ObjectivePreconditionEval | Nil
     property optim_dir = Direction::Minimize
     property constraints
 
@@ -118,16 +121,53 @@ module NLopt
       end
     end
 
+    # alias ObjectivePrecondition = Proc(Slice(Float64), Slice(Float64), Nil)
+    # alias ObjectivePreconditionEval = Proc(Slice(Float64), Slice(Float64), Slice(Float64), Nil)
+    @hessian : Array(Float64)?
+
+    protected def eval_pre(n, x : Float64*, v : Float64*, vpre : Float64*)
+      case pre = @precondition
+      when ObjectivePrecondition
+        h = @hessian
+        unless h
+          h = Array(Float64).new(n*n, 0.0)
+          @hessian = h
+        end
+        pre.call(x.to_slice(n), h.to_unsafe.to_slice(n*n))
+        n.times do |i|
+          vpre[i] = (0...n).sum { |j| h[i*n + j]*v[j] }
+        end
+      when ObjectivePreconditionEval
+        pre.call(x.to_slice(n), v.to_slice(n), vpre.to_slice(n))
+      else
+        raise "incorrect precondition"
+      end
+    end
+
     private def apply_objective(h)
       f = ->(n : LibC::UInt, x : LibC::Double*, grad : LibC::Double*, data : Void*) {
         it = data.as(Solver)
         it.eval_obj(n, x, grad)
       }
-      case @optim_dir
-      when Direction::Minimize
-        LibNLopt.set_min_objective(h, f, self.as(Void*))
+      if @precondition
+        f_pre = ->(n : LibC::UInt, x : LibC::Double*, v : Float64*, vpre : Float64*, data : Void*) {
+          it = data.as(Solver)
+          it.eval_pre(n, x, v, vpre)
+        }
+        @hessian = nil
+        case @optim_dir
+        when Direction::Minimize
+          LibNLopt.set_precond_min_objective(h, f, f_pre, self.as(Void*))
+        else
+          LibNLopt.set_precond_max_objective(h, f, f_pre, self.as(Void*))
+        end
       else
-        LibNLopt.set_max_objective(h, f, self.as(Void*))
+        case @optim_dir
+        when Direction::Minimize
+          LibNLopt.set_min_objective(h, f, self.as(Void*))
+        else
+          LibNLopt.set_max_objective(h, f, self.as(Void*))
+        end
       end
     end
 
