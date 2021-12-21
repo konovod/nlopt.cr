@@ -33,6 +33,39 @@ describe NLopt do
     f.should be_close(0.544330847, 1e-5)
   end
 
+  it "can work with nonlinear vector constraints" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
+    s1.xtol_rel = 1e-4
+    s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
+      if grad
+        grad[0] = 0.0
+        grad[1] = 0.5 / Math.sqrt(x[1])
+      end
+      Math.sqrt(x[1])
+    end
+    s1.constraints << NLopt.inequalities(2) do |x, grad, result|
+      a = {2, -1}
+      b = {0, 1}
+      if grad
+        2.times do |i|
+          grad[i*2 + 0] = 3 * a[i] * (a[i]*x[0] + b[i]) * (a[i]*x[0] + b[i])
+          grad[i*2 + 1] = -1.0
+        end
+      end
+      2.times do |i|
+        result[i] = (a[i]*x[0] + b[i]) * (a[i]*x[0] + b[i]) * (a[i]*x[0] + b[i]) - x[1]
+      end
+    end
+    s1.variables[1].min = 0.0
+    s1.variables[0].guess = 1.234
+    s1.variables[1].guess = 5.678
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::XtolReached
+    x[0].should be_close(0.333334, 1e-5)
+    x[1].should be_close(0.296296, 1e-5)
+    f.should be_close(0.544330847, 1e-5)
+  end
+
   it "can work with equalities" do
     s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 3)
     s1.optim_dir = NLopt::Direction::Maximize

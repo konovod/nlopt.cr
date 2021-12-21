@@ -126,7 +126,20 @@ s1.constraints << NLopt.equality do |x, grad|
   x[0] + x[1] - 3
 end
 ```
- - [ ] Vector-valued constraints
+ - [x] Vector-valued constraints
+```crystal
+s1.constraints << NLopt.inequalities(2) do |x, grad, result|
+  if grad
+    grad[0] = 3 * a1 * (a1*x[0] + b1) * (a1*x[0] + b1)
+    grad[1] = -1.0
+    grad[2] = 3 * a2 * (a2*x[0] + b2) * (a2*x[0] + b2)
+    grad[3] = -1.0
+  end
+  result[0] = ((a1*x[0] + b1) * (a1*x[0] + b1) * (a1*x[0] + b1) - x[1])
+  result[1] = ((a2*x[0] + b2) * (a2*x[0] + b2) * (a2*x[0] + b2) - x[1])
+end
+```
+
  - [ ] Forced termination (would require multithreading as currently optimization is syncronous)
  - [ ] Algorithm-specific parameters
  - [x] setting random seed
