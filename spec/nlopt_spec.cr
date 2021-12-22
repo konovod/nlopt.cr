@@ -99,7 +99,6 @@ describe NLopt do
     res.should eq NLopt::Result::XtolReached
     x[1].should be_close(2, 1e-7)
     f.should be_close(0, 1e-7)
-    p s1.num_evals
     nold = n
     n = 0
     s1.precondition = ->(x : Slice(Float64), hessian : Slice(Float64)) do
@@ -112,7 +111,6 @@ describe NLopt do
     res.should eq NLopt::Result::XtolReached
     x[1].should be_close(2, 1e-7)
     f.should be_close(0, 1e-7)
-    p s1.num_evals
     n.should be < nold
   end
 
