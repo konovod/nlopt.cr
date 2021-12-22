@@ -166,6 +166,7 @@ NLopt.srand(12345_u64) # will set fixed seed
     end
  ```
  - [ ] Preconditioning with approximate Hessians for constraints
+ - [x] Get number of objective function evaluations (`Solver#num_evals`) to estimate efficiency
  - [x] Version number
 ```crystal
 LibNLopt.version(out major, out minor, out bugfix)

@@ -99,6 +99,7 @@ describe NLopt do
     res.should eq NLopt::Result::XtolReached
     x[1].should be_close(2, 1e-7)
     f.should be_close(0, 1e-7)
+    p s1.num_evals
     nold = n
     n = 0
     s1.precondition = ->(x : Slice(Float64), hessian : Slice(Float64)) do
@@ -111,6 +112,7 @@ describe NLopt do
     res.should eq NLopt::Result::XtolReached
     x[1].should be_close(2, 1e-7)
     f.should be_close(0, 1e-7)
+    p s1.num_evals
     n.should be < nold
   end
 
@@ -133,5 +135,23 @@ describe NLopt do
     res.should eq NLopt::Result::XtolReached
     x[1].should be_close(2, 1e-7)
     f.should be_close(0, 1e-7)
+  end
+
+  it "count number of evaluations" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LnCobyla, 2)
+    n = 0
+    s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
+      n += 1
+      if grad
+        grad[0] = (x[1] - 2)**2
+        grad[1] = 2*(x[0] - 1)*(x[1] - 2)
+      end
+      (x[0] - 1) * (x[1] - 2)**2
+    end
+    s1.variables[0].min = 2.0
+    s1.variables[1].max = 10.0
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::XtolReached
+    s1.num_evals.should eq n
   end
 end

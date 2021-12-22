@@ -203,6 +203,10 @@ module NLopt
       ftol_rel > 0 || ftol_abs > 0 || xtol_rel > 0 || maxeval > 0 || maxtime > 0
     end
 
+    def num_evals
+      LibNLopt.get_numevals(@handle.not_nil!)
+    end
+
     def solve
       raise "solver not initialized" unless h = @handle
       apply_objective(h)
