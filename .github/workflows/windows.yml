@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Crystal
-      uses: crystal-lang/install-crystal@v1.5.3
+      uses: crystal-lang/install-crystal
     - name: Download NLOpt sources
       uses: actions/checkout@v2
       with:
