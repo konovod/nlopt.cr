@@ -34,7 +34,7 @@ jobs:
         copy .\nlopt.lib ..\..\nlopt.lib
         cd ..
         cd ..
-        copy .\nlopt.lib D:\a\_temp\crystal-nightly-true-undefined\bin\lib
+        copy .\nlopt.lib D:\a\_temp\crystal-nightly-true-undefined\lib
     - name: Upload nlopt.dll
       uses: actions/upload-artifact@v2
       with:
