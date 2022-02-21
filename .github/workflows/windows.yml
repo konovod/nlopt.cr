@@ -20,10 +20,11 @@ jobs:
         repository: stevengj/nlopt
         ref: v2.7.1
         path: nlopt
+    - name: Set up Visual Studio shell
+      uses: egor-tensin/vs-shell@v2
     - name: Build NLOpt
       shell: cmd
       run: |
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         cd nlopt
         md build
         cd build
