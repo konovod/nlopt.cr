@@ -36,12 +36,12 @@ jobs:
         cd ..
         copy .\nlopt.lib D:\a\_temp\crystal-nightly-true-undefined\lib
     - name: Upload nlopt.dll
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: nlopt_${{github.sha}}
         path: nlopt.dll
     - name: Upload nlopt.lib
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: nlopt_${{github.sha}}
         path: nlopt.lib
