@@ -30,7 +30,7 @@ On Windows:
   3. copy `libnlopt-0.dll` to your program directory (rename to `nlopt.dll`)
   4. copy `nlopt.lib` to where your Crystal looks for lib files
 
-Alternatively, you can compile latest (2.7.1) version from source (https://github.com/stevengj/nlopt). Windows CI Action does it too, so you can grab dll library from it's artifacts. Note that it depends on msvcp140.dll.
+Alternatively, you can compile latest (2.9.1) version from source (https://github.com/stevengj/nlopt). Windows CI Action does it too, so you can grab dll library from it's artifacts. Note that it depends on msvcp140.dll.
 
 ## Usage
 
@@ -143,7 +143,13 @@ end
 ```
 
  - [ ] Forced termination (would require multithreading as currently optimization is syncronous)
- - [ ] Algorithm-specific parameters (only for NLOpt version >= 2.7)
+ - [x] Algorithm-specific parameters (only for NLOpt version >= 2.7)
+```crystal
+    s1.params["inner_maxeval"] = 100 # set upper bound on the number of "inner" iterations of the algorithm MMA
+    s1.params["wrong_param"] = 10 # for now, there is no way to check that parameter even exists
+
+    puts s1.params.all_changed # => {"inner_maxeval" => 100.0, "wrong_param" => 10.0}
+```
  - [x] setting random seed
 ```crystal
 NLopt.srand # will randomize seed

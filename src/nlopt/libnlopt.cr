@@ -1,49 +1,48 @@
 module NLopt
   enum Algorithm
-    GnDirect                =  0
-    GnDirectL               =  1
-    GnDirectLRand           =  2
-    GnDirectNoscal          =  3
-    GnDirectLNoscal         =  4
-    GnDirectLRandNoscal     =  5
-    GnOrigDirect            =  6
-    GnOrigDirectL           =  7
-    GdStogo                 =  8
-    GdStogoRand             =  9
-    LdLbfgsNocedal          = 10
-    LdLbfgs                 = 11
-    LnPraxis                = 12
-    LdVaR1                  = 13
-    LdVaR2                  = 14
-    LdTnewton               = 15
-    LdTnewtonRestart        = 16
-    LdTnewtonPrecond        = 17
-    LdTnewtonPrecondRestart = 18
-    GnCrS2Lm                = 19
-    GnMlsl                  = 20
-    GdMlsl                  = 21
-    GnMlslLds               = 22
-    GdMlslLds               = 23
-    LdMma                   = 24
-    LnCobyla                = 25
-    LnNewuoa                = 26
-    LnNewuoaBound           = 27
-    LnNeldermead            = 28
-    LnSbplx                 = 29
-    LnAuglag                = 30
-    LdAuglag                = 31
-    LnAuglagEq              = 32
-    LdAuglagEq              = 33
-    LnBobyqa                = 34
-    GnIsres                 = 35
-    Auglag                  = 36
-    AuglagEq                = 37
-    GMlsl                   = 38
-    GMlslLds                = 39
-    LdSlsqp                 = 40
-    LdCcsaq                 = 41
-    GnEsch                  = 42
-    GnAgs                   = 43
+    GnDirect                = 0
+    GnDirectL
+    GnDirectLRand
+    GnDirectNoscal
+    GnDirectLNoscal
+    GnDirectLRandNoscal
+    GnOrigDirect
+    GnOrigDirectL
+    GdStogo
+    GdStogoRand
+    LdLbfgs
+    LnPraxis
+    LdVaR1
+    LdVaR2
+    LdTnewton
+    LdTnewtonRestart
+    LdTnewtonPrecond
+    LdTnewtonPrecondRestart
+    GnCrS2Lm
+    GnMlsl
+    GdMlsl
+    GnMlslLds
+    GdMlslLds
+    LdMma
+    LnCobyla
+    LnNewuoa
+    LnNewuoaBound
+    LnNeldermead
+    LnSbplx
+    LnAuglag
+    LdAuglag
+    LnAuglagEq
+    LdAuglagEq
+    LnBobyqa
+    GnIsres
+    Auglag
+    AuglagEq
+    GMlsl
+    GMlslLds
+    LdSlsqp
+    LdCcsaq
+    GnEsch
+    GnAgs
   end
 
   enum Result
@@ -98,7 +97,7 @@ lib LibNLopt
   fun get_param = nlopt_get_param(opt : Opt, name : LibC::Char*, defaultval : LibC::Double) : LibC::Double
   fun has_param = nlopt_has_param(opt : Opt, name : LibC::Char*) : LibC::Int
   fun num_params = nlopt_num_params(opt : Opt) : LibC::UInt
-  fun nlopt_nth_param = nlopt_nth_param(opt : Opt, n : LibC::UInt) : LibC::Char*
+  fun nth_param = nlopt_nth_param(opt : Opt, n : LibC::UInt) : LibC::Char*
 
   fun set_lower_bounds = nlopt_set_lower_bounds(opt : Opt, lb : LibC::Double*) : NLopt::Result
   fun set_lower_bounds1 = nlopt_set_lower_bounds1(opt : Opt, lb : LibC::Double) : NLopt::Result

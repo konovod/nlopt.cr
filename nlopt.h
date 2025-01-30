@@ -62,15 +62,13 @@ typedef double (*nlopt_func)(unsigned n, const double *x,
 			     double *gradient, /* NULL if not needed */
 			     void *func_data);
 
-typedef void (*nlopt_mfunc)(unsigned m, double *result,
-			    unsigned n, const double *x,
+typedef void (*nlopt_mfunc)(unsigned m, double *result, unsigned n, const double *x,
 			     double *gradient, /* NULL if not needed */
 			     void *func_data);
 
 /* A preconditioner, which preconditions v at x to return vpre. 
    (The meaning of "preconditioning" is algorithm-dependent.) */
-typedef void (*nlopt_precond)(unsigned n, const double *x, const double *v,
-			      double *vpre, void *data);
+typedef void (*nlopt_precond)(unsigned n, const double *x, const double *v, double *vpre, void *data);
 
 typedef enum {
      /* Naming conventions:
@@ -195,13 +193,10 @@ NLOPT_EXTERN(nlopt_opt) nlopt_create(nlopt_algorithm algorithm, unsigned n);
 NLOPT_EXTERN(void) nlopt_destroy(nlopt_opt opt);
 NLOPT_EXTERN(nlopt_opt) nlopt_copy(const nlopt_opt opt);
 
-NLOPT_EXTERN(nlopt_result) nlopt_optimize(nlopt_opt opt, double *x,
-					 double *opt_f);
+NLOPT_EXTERN(nlopt_result) nlopt_optimize(nlopt_opt opt, double *x, double *opt_f);
 
-NLOPT_EXTERN(nlopt_result) nlopt_set_min_objective(nlopt_opt opt, nlopt_func f, 
-						  void *f_data);
-NLOPT_EXTERN(nlopt_result) nlopt_set_max_objective(nlopt_opt opt, nlopt_func f, 
-						  void *f_data);
+NLOPT_EXTERN(nlopt_result) nlopt_set_min_objective(nlopt_opt opt, nlopt_func f, void *f_data);
+NLOPT_EXTERN(nlopt_result) nlopt_set_max_objective(nlopt_opt opt, nlopt_func f, void *f_data);
 
 NLOPT_EXTERN(nlopt_result) nlopt_set_precond_min_objective(nlopt_opt opt, nlopt_func f, nlopt_precond pre, void *f_data);
 NLOPT_EXTERN(nlopt_result) nlopt_set_precond_max_objective(nlopt_opt opt, nlopt_func f, nlopt_precond pre, void *f_data);
@@ -211,44 +206,22 @@ NLOPT_EXTERN(unsigned) nlopt_get_dimension(const nlopt_opt opt);
 
 /* constraints: */
 
-NLOPT_EXTERN(nlopt_result) nlopt_set_lower_bounds(nlopt_opt opt, 
-						 const double *lb);
+NLOPT_EXTERN(nlopt_result) nlopt_set_lower_bounds(nlopt_opt opt, const double *lb);
 NLOPT_EXTERN(nlopt_result) nlopt_set_lower_bounds1(nlopt_opt opt, double lb);
-NLOPT_EXTERN(nlopt_result) nlopt_get_lower_bounds(const nlopt_opt opt, 
-						 double *lb);
-NLOPT_EXTERN(nlopt_result) nlopt_set_upper_bounds(nlopt_opt opt, 
-						 const double *ub);
+NLOPT_EXTERN(nlopt_result) nlopt_get_lower_bounds(const nlopt_opt opt, double *lb);
+NLOPT_EXTERN(nlopt_result) nlopt_set_upper_bounds(nlopt_opt opt, const double *ub);
 NLOPT_EXTERN(nlopt_result) nlopt_set_upper_bounds1(nlopt_opt opt, double ub);
-NLOPT_EXTERN(nlopt_result) nlopt_get_upper_bounds(const nlopt_opt opt,
-						 double *ub);
+NLOPT_EXTERN(nlopt_result) nlopt_get_upper_bounds(const nlopt_opt opt, double *ub);
 
 NLOPT_EXTERN(nlopt_result) nlopt_remove_inequality_constraints(nlopt_opt opt);
-NLOPT_EXTERN(nlopt_result) nlopt_add_inequality_constraint(nlopt_opt opt,
-							  nlopt_func fc,
-							  void *fc_data,
-							  double tol);
-NLOPT_EXTERN(nlopt_result) nlopt_add_precond_inequality_constraint(
-     nlopt_opt opt, nlopt_func fc, nlopt_precond pre, void *fc_data,
-     double tol);
-NLOPT_EXTERN(nlopt_result) nlopt_add_inequality_mconstraint(nlopt_opt opt,
-							    unsigned m,
-							    nlopt_mfunc fc,
-							    void *fc_data,
-							    const double *tol);
+NLOPT_EXTERN(nlopt_result) nlopt_add_inequality_constraint(nlopt_opt opt, nlopt_func fc, void *fc_data, double tol);
+NLOPT_EXTERN(nlopt_result) nlopt_add_precond_inequality_constraint(nlopt_opt opt, nlopt_func fc, nlopt_precond pre, void *fc_data, double tol);
+NLOPT_EXTERN(nlopt_result) nlopt_add_inequality_mconstraint(nlopt_opt opt, unsigned m, nlopt_mfunc fc, void *fc_data, const double *tol);
 
 NLOPT_EXTERN(nlopt_result) nlopt_remove_equality_constraints(nlopt_opt opt);
-NLOPT_EXTERN(nlopt_result) nlopt_add_equality_constraint(nlopt_opt opt,
-							nlopt_func h,
-							void *h_data,
-							double tol);
-NLOPT_EXTERN(nlopt_result) nlopt_add_precond_equality_constraint(
-     nlopt_opt opt, nlopt_func h, nlopt_precond pre, void *h_data,
-     double tol);
-NLOPT_EXTERN(nlopt_result) nlopt_add_equality_mconstraint(nlopt_opt opt,
-							  unsigned m,
-							  nlopt_mfunc h,
-							  void *h_data,
-							  const double *tol);
+NLOPT_EXTERN(nlopt_result) nlopt_add_equality_constraint(nlopt_opt opt, nlopt_func h, void *h_data, double tol);
+NLOPT_EXTERN(nlopt_result) nlopt_add_precond_equality_constraint(nlopt_opt opt, nlopt_func h, nlopt_precond pre, void *h_data, double tol);
+NLOPT_EXTERN(nlopt_result) nlopt_add_equality_mconstraint(nlopt_opt opt, unsigned m, nlopt_mfunc h, void *h_data, const double *tol);
 
 /* stopping criteria: */
 
@@ -264,8 +237,7 @@ NLOPT_EXTERN(nlopt_result) nlopt_set_xtol_rel(nlopt_opt opt, double tol);
 NLOPT_EXTERN(double) nlopt_get_xtol_rel(const nlopt_opt opt);
 NLOPT_EXTERN(nlopt_result) nlopt_set_xtol_abs1(nlopt_opt opt, double tol);
 NLOPT_EXTERN(nlopt_result) nlopt_set_xtol_abs(nlopt_opt opt, const double *tol);
-NLOPT_EXTERN(nlopt_result) nlopt_get_xtol_abs(const nlopt_opt opt,
-					     double *tol);
+NLOPT_EXTERN(nlopt_result) nlopt_get_xtol_abs(const nlopt_opt opt, double *tol);
 
 NLOPT_EXTERN(nlopt_result) nlopt_set_maxeval(nlopt_opt opt, int maxeval);
 NLOPT_EXTERN(int) nlopt_get_maxeval(const nlopt_opt opt);
@@ -279,8 +251,7 @@ NLOPT_EXTERN(int) nlopt_get_force_stop(const nlopt_opt opt);
 
 /* more algorithm-specific parameters */
 
-NLOPT_EXTERN(nlopt_result) nlopt_set_local_optimizer(nlopt_opt opt, 
-						    const nlopt_opt local_opt);
+NLOPT_EXTERN(nlopt_result) nlopt_set_local_optimizer(nlopt_opt opt, const nlopt_opt local_opt);
 
 NLOPT_EXTERN(nlopt_result) nlopt_set_population(nlopt_opt opt, unsigned pop);
 NLOPT_EXTERN(unsigned) nlopt_get_population(const nlopt_opt opt);
@@ -288,25 +259,19 @@ NLOPT_EXTERN(unsigned) nlopt_get_population(const nlopt_opt opt);
 NLOPT_EXTERN(nlopt_result) nlopt_set_vector_storage(nlopt_opt opt, unsigned dim);
 NLOPT_EXTERN(unsigned) nlopt_get_vector_storage(const nlopt_opt opt);
 
-NLOPT_EXTERN(nlopt_result) nlopt_set_default_initial_step(nlopt_opt opt, 
-							 const double *x);
-NLOPT_EXTERN(nlopt_result) nlopt_set_initial_step(nlopt_opt opt, 
-						 const double *dx);
+NLOPT_EXTERN(nlopt_result) nlopt_set_default_initial_step(nlopt_opt opt, const double *x);
+NLOPT_EXTERN(nlopt_result) nlopt_set_initial_step(nlopt_opt opt, const double *dx);
 NLOPT_EXTERN(nlopt_result) nlopt_set_initial_step1(nlopt_opt opt, double dx);
-NLOPT_EXTERN(nlopt_result) nlopt_get_initial_step(const nlopt_opt opt, 
-						 const double *x, double *dx);
+NLOPT_EXTERN(nlopt_result) nlopt_get_initial_step(const nlopt_opt opt, const double *x, double *dx);
 
 /* the following are functions mainly designed to be used internally
    by the Fortran and SWIG wrappers, allow us to tel nlopt_destroy and
    nlopt_copy to do something to the f_data pointers (e.g. free or
    duplicate them, respectively) */
-typedef void* (*nlopt_munge)(void *p);
-NLOPT_EXTERN(void) nlopt_set_munge(nlopt_opt opt,
-				  nlopt_munge munge_on_destroy,
-				  nlopt_munge munge_on_copy);
-typedef void* (*nlopt_munge2)(void *p, void *data);
-NLOPT_EXTERN(void) nlopt_munge_data(nlopt_opt opt,
-                                    nlopt_munge2 munge, void *data);
+typedef void *(*nlopt_munge)(void *p);
+NLOPT_EXTERN(void) nlopt_set_munge(nlopt_opt opt, nlopt_munge munge_on_destroy, nlopt_munge munge_on_copy);
+typedef void *(*nlopt_munge2)(void *p, void *data);
+NLOPT_EXTERN(void) nlopt_munge_data(nlopt_opt opt, nlopt_munge2 munge, void *data);
 
 /*************************** DEPRECATED API **************************/
 /* The new "object-oriented" API is preferred, since it allows us to
@@ -322,50 +287,30 @@ NLOPT_EXTERN(void) nlopt_munge_data(nlopt_opt opt,
 #  define NLOPT_DEPRECATED 
 #endif
 
-typedef double (*nlopt_func_old)(int n, const double *x,
-				 double *gradient, /* NULL if not needed */
+typedef double (*nlopt_func_old)(int n, const double *x, double *gradient, /* NULL if not needed */
 				 void *func_data);
 
-NLOPT_EXTERN(nlopt_result) nlopt_minimize(
-     nlopt_algorithm algorithm,
-     int n, nlopt_func_old f, void *f_data,
+NLOPT_EXTERN(nlopt_result) nlopt_minimize(nlopt_algorithm algorithm, int n, nlopt_func_old f, void *f_data,
      const double *lb, const double *ub, /* bounds */
      double *x, /* in: initial guess, out: minimizer */
      double *minf, /* out: minimum */
-     double minf_max, double ftol_rel, double ftol_abs,
-     double xtol_rel, const double *xtol_abs,
-     int maxeval, double maxtime) NLOPT_DEPRECATED;
+     double minf_max, double ftol_rel, double ftol_abs, double xtol_rel, const double *xtol_abs, int maxeval, double maxtime) NLOPT_DEPRECATED;
 
-NLOPT_EXTERN(nlopt_result) nlopt_minimize_constrained(
-     nlopt_algorithm algorithm,
-     int n, nlopt_func_old f, void *f_data,
-     int m, nlopt_func_old fc, void *fc_data, ptrdiff_t fc_datum_size,
+NLOPT_EXTERN(nlopt_result) nlopt_minimize_constrained(nlopt_algorithm algorithm, int n, nlopt_func_old f, void *f_data, int m, nlopt_func_old fc, void *fc_data, ptrdiff_t fc_datum_size,
      const double *lb, const double *ub, /* bounds */
      double *x, /* in: initial guess, out: minimizer */
      double *minf, /* out: minimum */
-     double minf_max, double ftol_rel, double ftol_abs,
-     double xtol_rel, const double *xtol_abs,
-     int maxeval, double maxtime) NLOPT_DEPRECATED;
+     double minf_max, double ftol_rel, double ftol_abs, double xtol_rel, const double *xtol_abs, int maxeval, double maxtime) NLOPT_DEPRECATED;
 
-NLOPT_EXTERN(nlopt_result) nlopt_minimize_econstrained(
-     nlopt_algorithm algorithm,
-     int n, nlopt_func_old f, void *f_data,
-     int m, nlopt_func_old fc, void *fc_data, ptrdiff_t fc_datum_size,
-     int p, nlopt_func_old h, void *h_data, ptrdiff_t h_datum_size,
+NLOPT_EXTERN(nlopt_result) nlopt_minimize_econstrained(nlopt_algorithm algorithm, int n, nlopt_func_old f, void *f_data, int m, nlopt_func_old fc, void *fc_data, ptrdiff_t fc_datum_size, int p, nlopt_func_old h, void *h_data, ptrdiff_t h_datum_size,
      const double *lb, const double *ub, /* bounds */
      double *x, /* in: initial guess, out: minimizer */
      double *minf, /* out: minimum */
-     double minf_max, double ftol_rel, double ftol_abs,
-     double xtol_rel, const double *xtol_abs,
-     double htol_rel, double htol_abs,
-     int maxeval, double maxtime) NLOPT_DEPRECATED;
+     double minf_max, double ftol_rel, double ftol_abs, 
+     double xtol_rel, const double *xtol_abs, double htol_rel, double htol_abs, int maxeval, double maxtime) NLOPT_DEPRECATED;
 
-NLOPT_EXTERN(void) nlopt_get_local_search_algorithm(nlopt_algorithm *deriv,
-					     nlopt_algorithm *nonderiv,
-					     int *maxeval) NLOPT_DEPRECATED;
-NLOPT_EXTERN(void) nlopt_set_local_search_algorithm(nlopt_algorithm deriv,
-					     nlopt_algorithm nonderiv,
-					     int maxeval) NLOPT_DEPRECATED;
+NLOPT_EXTERN(void) nlopt_get_local_search_algorithm(nlopt_algorithm *deriv, nlopt_algorithm *nonderiv, int *maxeval) NLOPT_DEPRECATED;
+NLOPT_EXTERN(void) nlopt_set_local_search_algorithm(nlopt_algorithm deriv, nlopt_algorithm nonderiv, int maxeval) NLOPT_DEPRECATED;
 
 NLOPT_EXTERN(int) nlopt_get_stochastic_population(void) NLOPT_DEPRECATED;
 NLOPT_EXTERN(void) nlopt_set_stochastic_population(int pop) NLOPT_DEPRECATED;

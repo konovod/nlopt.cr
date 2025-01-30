@@ -43,7 +43,7 @@ jobs:
     - name: Upload nlopt.lib
       uses: actions/upload-artifact@v4
       with:
-        name: nlopt_${{github.sha}}
+        name: nlopt_lib_${{github.sha}}
         path: nlopt.lib
     - name: Run tests
       run: crystal spec

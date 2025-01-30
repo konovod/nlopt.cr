@@ -77,6 +77,10 @@ module NLopt
       @constraints = [] of Constraint
     end
 
+    def to_unsafe
+      @handle.not_nil!
+    end
+
     def algorithm : Algorithm
       LibNLopt.get_algorithm(@handle.not_nil!)
     end
@@ -231,6 +235,34 @@ module NLopt
 
     def local_optimizer(local : Solver)
       LibNLopt.set_local_optimizer(@handle.not_nil!, local.@handle.not_nil!)
+    end
+
+    def params
+      AlgorithmParams.new(self)
+    end
+  end
+
+  struct AlgorithmParams
+    def initialize(@solver : Solver)
+    end
+
+    def []=(param : String, value : Float64)
+      LibNLopt.set_param(@solver, param, value)
+    end
+
+    def [](param : String) : Float64?
+      return nil unless LibNLopt.has_param(@solver, param)
+      v = LibNLopt.get_param(@solver, param, Float64::NAN)
+      v.nan? ? nil : v
+    end
+
+    def all_changed : Hash(String, Float64)
+      result = {} of String => Float64
+      LibNLopt.num_params(@solver).times do |i|
+        param = String.new(LibNLopt.nth_param(@solver, i))
+        result[param] = self[param].not_nil!
+      end
+      result
     end
   end
 end

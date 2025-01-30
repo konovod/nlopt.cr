@@ -152,4 +152,17 @@ describe NLopt do
     res.should eq NLopt::Result::XtolReached
     s1.num_evals.should eq n
   end
+
+  it "access algorithm-specific params" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
+    s1.params.all_changed.empty?.should be_true
+    s1.params["inner_maxeval"].should be_nil
+
+    s1.params["inner_maxeval"] = 100
+    s1.params["wrong_param"] = 10
+
+    s1.params.all_changed.should eq({"inner_maxeval" => 100, "wrong_param" => 10})
+    s1.params["inner_maxeval"].should eq 100
+    s1.params["wrong_param"].should eq 10
+  end
 end
