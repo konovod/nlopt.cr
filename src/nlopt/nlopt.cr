@@ -240,6 +240,10 @@ module NLopt
     def params
       AlgorithmParams.new(self)
     end
+
+    def force_stop
+      LibNLopt.force_stop(self)
+    end
   end
 
   struct AlgorithmParams

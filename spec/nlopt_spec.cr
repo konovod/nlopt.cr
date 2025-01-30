@@ -165,4 +165,21 @@ describe NLopt do
     s1.params["inner_maxeval"].should eq 100
     s1.params["wrong_param"].should eq 10
   end
+
+  it "allow to stop optimization early" do
+    s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
+    timer = 100
+    s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
+      timer -= 1
+      s1.force_stop if timer <= 100
+      if grad
+        grad[0] = (x[1] - 2)**2
+        grad[1] = 2*(x[0] - 1)*(x[1] - 2)
+      end
+      (x[0] - 1) * (x[1] - 2)**2
+    end
+    res, x, f = s1.solve
+    res.should eq NLopt::Result::ForcedStop
+    (f - (x[0] - 1) * (x[1] - 2)**2).should be_close 0, 1e-6
+  end
 end

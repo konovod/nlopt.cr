@@ -142,8 +142,28 @@ s1.constraints << NLopt.inequalities(2) do |x, grad, result|
 end
 ```
 
- - [ ] Forced termination (would require multithreading as currently optimization is syncronous)
- - [x] Algorithm-specific parameters (only for NLOpt version >= 2.7)
+ - [x] Forced termination
+ You can raise an exception in optimization function to abort optimization early but this won't keep latest result.
+ You can also do `#force_stop` to terminate optimization while keeping best point found:
+``` 
+  s1 = NLopt::Solver.new(NLopt::Algorithm::LdMma, 2)
+  timer = 100
+  s1.objective = ->(x : Slice(Float64), grad : Slice(Float64)?) do
+    timer -= 1
+    s1.force_stop if timer <= 100
+    if grad
+      grad[0] = (x[1] - 2)**2
+      grad[1] = 2*(x[0] - 1)*(x[1] - 2)
+    end
+    (x[0] - 1) * (x[1] - 2)**2
+  end
+  res, x, f = s1.solve  
+  res # => NLopt::Result::ForcedStop
+  x   # => [4.0, 0.0]
+  f   # => 12.0
+```
+
+ - [x] Algorithm-specific parameters
 ```crystal
     s1.params["inner_maxeval"] = 100 # set upper bound on the number of "inner" iterations of the algorithm MMA
     s1.params["wrong_param"] = 10 # for now, there is no way to check that parameter even exists
