@@ -110,7 +110,7 @@ module NLopt
     end
 
     protected def eval_obj(n, x : Float64*, grad : Float64*) : Float64
-      need_grad = grad != Pointer(Float64).new(0)
+      need_grad = grad != Pointer(Float64).null
       case obj = @objective
       when ObjectiveWithGrad
         obj.call(x.to_slice(n), need_grad ? grad.to_slice(n) : nil)

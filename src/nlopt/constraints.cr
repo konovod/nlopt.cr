@@ -61,7 +61,7 @@ module NLopt
     property equality : Bool
 
     protected def eval_f(n, x : Float64*, grad : Float64*) : Float64
-      need_grad = grad != Pointer(Float64).new(0)
+      need_grad = grad != Pointer(Float64).null
       f.call(x.to_slice(n), need_grad ? grad.to_slice(n) : nil)
     end
 
@@ -88,7 +88,7 @@ module NLopt
     property m : Int32
 
     protected def eval_f(n, x : Float64*, grad : Float64*, result : Float64*) : Nil
-      need_grad = grad != Pointer(Float64).new(0)
+      need_grad = grad != Pointer(Float64).null
       f.call(x.to_slice(n), need_grad ? grad.to_slice(@m*n) : nil, result.to_slice(m))
     end
 
